@@ -51,6 +51,8 @@ add_shortcode('rsv_checkout', function(){
     $ci = sanitize_text_field($_GET['ci'] ?? ($_POST['ci'] ?? ''));
     $co = sanitize_text_field($_GET['co'] ?? ($_POST['co'] ?? ''));
     $guests = max(1, intval($_GET['guests'] ?? ($_POST['guests'] ?? 1)));
+    $total = rsv_quote_total($accomm_id,$ci,$co,$guests);
+
 
     if (isset($_GET['rsv_stripe']) && $_GET['rsv_stripe']==='return' && !empty($_GET['session_id'])){
         $session = rsv_stripe_retrieve_session(sanitize_text_field($_GET['session_id']));
@@ -60,6 +62,8 @@ add_shortcode('rsv_checkout', function(){
             $lname = sanitize_text_field($_GET['last_name'] ?? '');
             $email = sanitize_email($_GET['email'] ?? '');
             $phone = sanitize_text_field($_GET['phone'] ?? '');
+            $notes = sanitize_textarea_field($_GET['notes'] ?? '');
+
             $full = trim($fname.' '.$lname);
             $exists = get_posts(['post_type'=>'rsv_booking','post_status'=>['confirmed','publish'],'numberposts'=>1,
                 'meta_query'=>[['key'=>'rsv_stripe_session','value'=>sanitize_text_field($_GET['session_id']),'compare'=>'=']]]);
@@ -75,8 +79,17 @@ add_shortcode('rsv_checkout', function(){
                     update_post_meta($bid,'rsv_guest_email',$email);
                     update_post_meta($bid,'rsv_guest_phone',$phone);
                     update_post_meta($bid,'rsv_total_guests',$guests);
+                    update_post_meta($bid,'rsv_booking_notes',$notes);
+                    update_post_meta($bid,'rsv_booking_total',$total);
+                    update_post_meta($bid,'rsv_price_paid',$total);
+                    update_post_meta($bid,'rsv_payment_method','stripe');
                     update_post_meta($bid,'rsv_payment_status','paid');
                     update_post_meta($bid,'rsv_stripe_session',sanitize_text_field($_GET['session_id']));
+                    if(!empty($session['payment_intent']))
+                        update_post_meta($bid,'rsv_stripe_payment_intent',sanitize_text_field($session['payment_intent']));
+                    update_post_meta($bid,'rsv_payment_status','paid');
+                    update_post_meta($bid,'rsv_stripe_session',sanitize_text_field($_GET['session_id']));
+
                     do_action('rsv_booking_confirmed', $bid, ['accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,'name'=>$full,'email'=>$email]);
                     echo '<div class="confirm"><div class="badge">✔</div><h3>'.esc_html__('Booking confirmed','reeserva').'</h3>';
                     echo '<p><strong>'.esc_html__('Reference','reeserva').':</strong> '.intval($bid).'</p>';
@@ -129,6 +142,7 @@ add_shortcode('rsv_checkout', function(){
         $lname = sanitize_text_field($_POST['last_name'] ?? '');
         $email = sanitize_email($_POST['email'] ?? '');
         $phone = sanitize_text_field($_POST['phone'] ?? '');
+        $notes = sanitize_textarea_field($_POST['notes'] ?? '');
         if(!$fname || !$lname || !$email || !$phone){
             echo '<div class="ehb-wizard"><div class="card"><p>'.esc_html__('Please fill all fields.','reeserva').'</p></div></div>';
             return '';
@@ -145,6 +159,10 @@ add_shortcode('rsv_checkout', function(){
             update_post_meta($bid,'rsv_guest_email',$email);
             update_post_meta($bid,'rsv_guest_phone',$phone);
             update_post_meta($bid,'rsv_total_guests',$guests);
+            update_post_meta($bid,'rsv_booking_notes',$notes);
+            update_post_meta($bid,'rsv_booking_total',$total);
+            update_post_meta($bid,'rsv_price_paid',$total);
+            update_post_meta($bid,'rsv_payment_method','manual');
             update_post_meta($bid,'rsv_payment_status','confirmed');
             do_action('rsv_booking_confirmed', $bid, ['accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,'name'=>$full,'email'=>$email,'total'=>$total]);
             echo '<div class="ehb-wizard"><div class="card"><div class="confirm"><div class="badge">✔</div><h3>'.esc_html__('Booking confirmed','reeserva').'</h3>';
@@ -165,6 +183,7 @@ add_shortcode('rsv_checkout', function(){
     echo '<label>'.esc_html__('Last name','reeserva').'<input type="text" name="last_name" required></label>';
     echo '<label>'.esc_html__('Email','reeserva').'<input type="email" name="email" required></label>';
     echo '<label>'.esc_html__('Phone','reeserva').'<input type="tel" name="phone" required></label>';
+    echo '<label>'.esc_html__('Notes','reeserva').'<textarea name="notes"></textarea></label>';
     if($p['stripe_enabled']){
         echo '<button id="rsv-pay" type="button" class="btn-primary">'.esc_html__('Pay now','reeserva').'</button></form>';
         echo '<script src="https://js.stripe.com/v3/\"></script>';

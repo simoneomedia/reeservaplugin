@@ -14,6 +14,7 @@ function rsv_stripe_checkout(){
     $lname = sanitize_text_field($_POST['last_name'] ?? '');
     $phone = sanitize_text_field($_POST['phone'] ?? '');
     $guests = max(1, intval($_POST['guests'] ?? 1));
+    $notes  = sanitize_text_field($_POST['notes'] ?? '');
     $name  = trim($fname.' '.$lname);
     $email = sanitize_email($_POST['email'] ?? '');
     if(!$accomm_id||!$ci||!$co||!$fname||!$lname||!$email||!$phone) wp_send_json_error(['message'=>'Missing fields']);
@@ -26,7 +27,8 @@ function rsv_stripe_checkout(){
         'rsv_stripe'=>'return','session_id'=>'{CHECKOUT_SESSION_ID}',
         'accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,
         'first_name'=>rawurlencode($fname),'last_name'=>rawurlencode($lname),
-        'email'=>rawurlencode($email),'phone'=>rawurlencode($phone),'guests'=>$guests
+        'email'=>rawurlencode($email),'phone'=>rawurlencode($phone),'guests'=>$guests,
+        'notes'=>rawurlencode($notes)
     ], rsv_checkout_url());
     $cancel  = add_query_arg(['accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,'guests'=>$guests], rsv_checkout_url());
 
@@ -49,6 +51,8 @@ function rsv_stripe_checkout(){
             'accomm_id'=>$accomm_id,'ci'=>$ci,'co'=>$co,
             'guest_first_name'=>$fname,'guest_last_name'=>$lname,
             'guest_phone'=>$phone,'guest_email'=>$email,'guests'=>$guests,
+            'notes'=>$notes,
+
         ]
     ];
     $headers = [

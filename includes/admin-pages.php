@@ -44,7 +44,7 @@ function rsv_render_calendar(){
         </table>
       </div>
 
-      <!-- Modal -->
+      <!-- Price Modal -->
       <div id="price-modal" class="modal-overlay" aria-modal="true">
         <div class="modal-content">
           <button class="modal-close" aria-label="<?php esc_attr_e('Close','reeserva')?>">×</button>
@@ -67,6 +67,18 @@ function rsv_render_calendar(){
           <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
             <button type="button" id="save-price" class="button button-primary"><?php esc_html_e('Save','reeserva');?></button>
             <button type="button" id="create-admin-booking" class="button"><?php esc_html_e('Create Reservation','reeserva')?></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Modal -->
+      <div id="booking-modal" class="modal-overlay" aria-modal="true">
+        <div class="modal-content">
+          <button class="modal-close" aria-label="<?php esc_attr_e('Close','reeserva')?>">×</button>
+          <h2><?php esc_html_e('Reservation Details','reeserva')?></h2>
+          <div id="booking-info"></div>
+          <div style="text-align:right;margin-top:10px">
+            <a id="booking-edit-link" href="#" class="button button-primary" target="_blank"><?php esc_html_e('Edit booking','reeserva')?></a>
           </div>
         </div>
       </div>
