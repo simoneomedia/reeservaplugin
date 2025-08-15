@@ -93,6 +93,7 @@ function rsv_render_booking_meta($post){
     $co   = get_post_meta($post->ID,'rsv_check_out',true);
     $gu   = get_post_meta($post->ID,'rsv_total_guests',true);
     $price= get_post_meta($post->ID,'rsv_price_paid',true);
+    if($price==='') $price = get_post_meta($post->ID,'rsv_booking_total',true);
     $method = get_post_meta($post->ID,'rsv_payment_method',true);
     $notes = get_post_meta($post->ID,'rsv_booking_notes',true);
     $session = get_post_meta($post->ID,'rsv_stripe_session',true);

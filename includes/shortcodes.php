@@ -78,6 +78,7 @@ add_shortcode('rsv_checkout', function(){
                     update_post_meta($bid,'rsv_guest_phone',$phone);
                     update_post_meta($bid,'rsv_total_guests',$guests);
                     update_post_meta($bid,'rsv_booking_notes',$notes);
+                    update_post_meta($bid,'rsv_booking_total',$total);
                     update_post_meta($bid,'rsv_price_paid',$total);
                     update_post_meta($bid,'rsv_payment_method','stripe');
                     update_post_meta($bid,'rsv_payment_status','paid');
@@ -153,6 +154,7 @@ add_shortcode('rsv_checkout', function(){
             update_post_meta($bid,'rsv_guest_phone',$phone);
             update_post_meta($bid,'rsv_total_guests',$guests);
             update_post_meta($bid,'rsv_booking_notes',$notes);
+            update_post_meta($bid,'rsv_booking_total',$total);
             update_post_meta($bid,'rsv_price_paid',$total);
             update_post_meta($bid,'rsv_payment_method','manual');
             update_post_meta($bid,'rsv_payment_status','confirmed');
