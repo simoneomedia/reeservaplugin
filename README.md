@@ -13,6 +13,12 @@ WordPress booking plugin with:
 ## Auto-updates
 Create a GitHub **Release** tag (e.g. `v1.2.1`) — WordPress will offer an update.
 
+## Release
+When preparing a new release, bump the `Version` header at the top of
+`reeserva-booking-suite.php` and create a matching Git tag. The
+`RSV_VER` constant is derived from the header automatically so the
+updater compares against the correct version.
+
 ## Stripe
 Set keys under **Reeserva → Email & Payments → Stripe**. If disabled, bookings confirm without payment.
 
