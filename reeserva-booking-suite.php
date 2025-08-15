@@ -5,8 +5,8 @@
  * Description: Airbnb‑style booking system with a single “Accommodation” post type. Calendar price editor with periods & per‑period variations, multi‑step checkout with Stripe, iCal import/export, email notifications, and frontend admin shortcodes.
  * Version: 1.5.0
  * Author: simoneomedia
- * Text Domain: reeserva1
- * Update URI: https://github.com/simoneomedia/reeserva1
+ * Text Domain: reeservaplugin
+ * Update URI: https://github.com/simoneomedia/reeservaplugin
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -68,7 +68,7 @@ add_action('init', function(){
     if ( class_exists('Reeserva_GitHub_Updater') ) {
         new Reeserva_GitHub_Updater(__FILE__, [
             'owner'  => 'simoneomedia',
-            'repo'   => 'reeserva1',
+            'repo'   => 'reeservaplugin',
             'branch' => 'main',
             'channel'=> 'stable',
         ]);
