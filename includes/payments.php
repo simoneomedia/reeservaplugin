@@ -52,6 +52,7 @@ function rsv_stripe_checkout(){
             'guest_first_name'=>$fname,'guest_last_name'=>$lname,
             'guest_phone'=>$phone,'guest_email'=>$email,'guests'=>$guests,
             'notes'=>$notes,
+
         ]
     ];
     $headers = [
