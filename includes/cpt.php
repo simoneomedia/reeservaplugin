@@ -79,3 +79,41 @@ add_action('save_post_rsv_accomm', function($post_id){
         update_post_meta($post_id,'rsv_ical_sources',$lines);
     }
 });
+
+// Booking details meta box
+add_action('add_meta_boxes', function(){
+    add_meta_box('rsv_booking_meta', __('Booking details','reeserva'),'rsv_render_booking_meta','rsv_booking','normal','high');
+});
+
+function rsv_render_booking_meta($post){
+    $name = get_post_meta($post->ID,'rsv_guest_name',true);
+    $email= get_post_meta($post->ID,'rsv_guest_email',true);
+    $phone= get_post_meta($post->ID,'rsv_guest_phone',true);
+    $ci   = get_post_meta($post->ID,'rsv_check_in',true);
+    $co   = get_post_meta($post->ID,'rsv_check_out',true);
+    $gu   = get_post_meta($post->ID,'rsv_total_guests',true);
+    $price= get_post_meta($post->ID,'rsv_price_paid',true);
+    $method = get_post_meta($post->ID,'rsv_payment_method',true);
+    $notes = get_post_meta($post->ID,'rsv_booking_notes',true);
+    $session = get_post_meta($post->ID,'rsv_stripe_session',true);
+    $intent  = get_post_meta($post->ID,'rsv_stripe_payment_intent',true);
+    ?>
+    <table class="form-table">
+      <tbody>
+        <tr><th><?php esc_html_e('Guest','reeserva');?></th><td><?php echo esc_html($name);?></td></tr>
+        <tr><th><?php esc_html_e('Email','reeserva');?></th><td><?php echo esc_html($email);?></td></tr>
+        <tr><th><?php esc_html_e('Phone','reeserva');?></th><td><?php echo esc_html($phone);?></td></tr>
+        <tr><th><?php esc_html_e('Check-in','reeserva');?></th><td><?php echo esc_html($ci);?></td></tr>
+        <tr><th><?php esc_html_e('Check-out','reeserva');?></th><td><?php echo esc_html($co);?></td></tr>
+        <tr><th><?php esc_html_e('Guests','reeserva');?></th><td><?php echo intval($gu);?></td></tr>
+        <tr><th><?php esc_html_e('Price paid','reeserva');?></th><td><?php echo esc_html($price);?></td></tr>
+        <tr><th><?php esc_html_e('Payment method','reeserva');?></th><td><?php echo esc_html($method);?></td></tr>
+        <?php if($method==='stripe'): ?>
+          <tr><th><?php esc_html_e('Stripe session','reeserva');?></th><td><?php echo esc_html($session);?></td></tr>
+          <?php if($intent): ?><tr><th><?php esc_html_e('Payment intent','reeserva');?></th><td><?php echo esc_html($intent);?></td></tr><?php endif; ?>
+        <?php endif; ?>
+        <tr><th><?php esc_html_e('Notes','reeserva');?></th><td><?php echo nl2br(esc_html($notes));?></td></tr>
+      </tbody>
+    </table>
+    <?php
+}

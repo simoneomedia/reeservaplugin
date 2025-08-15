@@ -16,7 +16,7 @@
 #calendar { max-width:1000px; background:#fff; border:1px solid #eee; border-radius:12px; padding:8px; }
 
 /* subtle chips on calendar */
-.fc-event.price-event { z-index: 0 !important; position:absolute; inset:2px 4px auto 4px; border:none; background:#e6f7ed !important; color:#14532d !important; font-weight:600; border-radius:8px; padding:2px 6px; }
+.fc-event.price-event { z-index: 1 !important; position:absolute; inset:2px 4px auto 4px; border:none; background:#e6f7ed !important; color:#14532d !important; font-weight:600; border-radius:8px; padding:2px 6px; pointer-events:none; }
 .fc-event.rsv-booking { background:#fee2e2 !important; border:none; color:#7f1d1d !important; border-radius:6px; }
 .fc-daygrid-day-frame { position: relative; }
 

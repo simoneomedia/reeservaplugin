@@ -16,9 +16,19 @@ function rsv_get_booked(){
         $co = get_post_meta($post->ID,'rsv_check_out',true);
         if(!$ci || !$co) continue;
         $events[] = [
+            'id'    => $post->ID,
             'title' => get_post_meta($post->ID,'rsv_guest_name',true) ?: __('Booking','reeserva'),
             'start' => $ci,
             'end'   => $co,
+            'guest_name'=> get_post_meta($post->ID,'rsv_guest_name',true),
+            'email'=> get_post_meta($post->ID,'rsv_guest_email',true),
+            'phone'=> get_post_meta($post->ID,'rsv_guest_phone',true),
+            'guests'=> get_post_meta($post->ID,'rsv_total_guests',true),
+            'price' => get_post_meta($post->ID,'rsv_price_paid',true),
+            'payment_method'=> get_post_meta($post->ID,'rsv_payment_method',true),
+            'stripe_session'=> get_post_meta($post->ID,'rsv_stripe_session',true),
+            'stripe_payment_intent'=> get_post_meta($post->ID,'rsv_stripe_payment_intent',true),
+            'notes' => get_post_meta($post->ID,'rsv_booking_notes',true),
         ];
     }
     wp_send_json_success($events);

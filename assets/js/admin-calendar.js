@@ -18,6 +18,9 @@
   const createBtn = document.getElementById('create-admin-booking');
   const syncBtn = document.getElementById('rsv-sync-ical');
   const syncRes = document.getElementById('rsv-sync-result');
+  const bookingModal = document.getElementById('booking-modal');
+  const bookingInfo = document.getElementById('booking-info');
+  const bookingEdit = document.getElementById('booking-edit-link');
 
   let currentType = parseInt(selectEl ? selectEl.value : 0,10);
   let selectedRange = null;
@@ -35,8 +38,9 @@
     fetch(ajax+'?'+p, {credentials:'same-origin'}).then(r=>r.json()).then(json=>{
       const data = json.data || [];
       success(data.map(e=> ({
-        title: e.title, start: e.start, end: e.end, allDay:true,
-        backgroundColor:'#fee2e2', borderColor:'#fee2e2', classNames:['rsv-booking']
+        id: e.id, title: e.title, start: e.start, end: e.end, allDay:true,
+        backgroundColor:'#fee2e2', borderColor:'#fee2e2', classNames:['rsv-booking'],
+        extendedProps: e
       })));
       // summary
       summaryBody.innerHTML='';
@@ -67,10 +71,14 @@
         start: info.startStr,
         end: new Date(new Date(info.endStr)-86400000).toISOString().split('T')[0]
       };
+      if(selectedRange.start===selectedRange.end){
+        const day = selectedRange.start;
+        const booking = calendar.getEvents().find(ev=> ev.classNames.indexOf('rsv-booking')>-1 && day>=ev.startStr && day<ev.endStr);
+        if(booking){ openBooking(booking.extendedProps); calendar.unselect(); return; }
+      }
       selectedDates.textContent = fmtRange(selectedRange.start, selectedRange.end);
       warningEl.style.display='none'; baseBox.innerHTML=''; varsCt.innerHTML='';
       addTier(1,0); // default first tier
-      // If single day, try load existing
       if(selectedRange.start===selectedRange.end){
         const qs = new URLSearchParams({action:'rsv_day_prices',nonce:nonceDay,type_id:currentType,start:selectedRange.start});
         fetch(ajax+'?'+qs,{credentials:'same-origin'}).then(r=>r.json()).then(d=>{
@@ -86,11 +94,18 @@
       }
       priceModal.classList.add('open');
     }
+    ,
+    eventClick(info){
+      info.jsEvent.preventDefault();
+      if(info.event.classNames.indexOf('rsv-booking')>-1){
+        openBooking(info.event.extendedProps);
+      }
+    }
   });
   calendar.render();
 
   if(selectEl){ selectEl.addEventListener('change', ()=>{ currentType = parseInt(selectEl.value,10); calendar.refetchEvents(); }); }
-  document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', ()=> priceModal.classList.remove('open')));
+  document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', ()=>{ priceModal.classList.remove('open'); bookingModal.classList.remove('open'); }));
 
   function addTier(nights, price){
     const row=document.createElement('div'); row.className='period-row';
@@ -179,5 +194,23 @@
         else { syncRes.textContent='iCal sync failed'; }
       }).catch(()=> syncRes.textContent='Network error');
     });
+  }
+
+  function openBooking(data){
+    if(!data) return;
+    bookingInfo.innerHTML = ''+
+      '<p><strong>Guest:</strong> '+(data.guest_name||'')+'</p>'+
+      '<p><strong>Email:</strong> '+(data.email||'')+'</p>'+
+      '<p><strong>Phone:</strong> '+(data.phone||'')+'</p>'+
+      '<p><strong>Check-in:</strong> '+(data.start||'')+'</p>'+
+      '<p><strong>Check-out:</strong> '+(data.end||'')+'</p>'+
+      '<p><strong>Guests:</strong> '+(data.guests||'')+'</p>'+
+      '<p><strong>Price:</strong> '+(data.price||'')+'</p>'+
+      '<p><strong>Payment:</strong> '+(data.payment_method||'')+'</p>'+
+      (data.payment_method==='stripe' && data.stripe_session ? '<p><strong>Session:</strong> '+data.stripe_session+'</p>' : '')+
+      (data.payment_method==='stripe' && data.stripe_payment_intent ? '<p><strong>Intent:</strong> '+data.stripe_payment_intent+'</p>' : '')+
+      '<p><strong>Notes:</strong> '+(data.notes||'')+'</p>';
+    if(bookingEdit) bookingEdit.href = 'post.php?post='+data.id+'&action=edit';
+    bookingModal.classList.add('open');
   }
 })();
