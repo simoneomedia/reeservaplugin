@@ -10,16 +10,25 @@ function rsv_stripe_checkout(){
     $accomm_id = intval($_POST['accomm'] ?? 0);
     $ci = sanitize_text_field($_POST['ci'] ?? '');
     $co = sanitize_text_field($_POST['co'] ?? '');
-    $name = sanitize_text_field($_POST['name'] ?? '');
-    $email= sanitize_email($_POST['email'] ?? '');
-    if(!$accomm_id||!$ci||!$co||!$name||!$email) wp_send_json_error(['message'=>'Missing fields']);
+    $fname = sanitize_text_field($_POST['first_name'] ?? '');
+    $lname = sanitize_text_field($_POST['last_name'] ?? '');
+    $phone = sanitize_text_field($_POST['phone'] ?? '');
+    $guests = max(1, intval($_POST['guests'] ?? 1));
+    $name  = trim($fname.' '.$lname);
+    $email = sanitize_email($_POST['email'] ?? '');
+    if(!$accomm_id||!$ci||!$co||!$fname||!$lname||!$email||!$phone) wp_send_json_error(['message'=>'Missing fields']);
 
-    $total = rsv_quote_total($accomm_id,$ci,$co);
+    $total = rsv_quote_total($accomm_id,$ci,$co,$guests);
     $amount = max(0, round($total*100)); // cents
     if ($amount < 50) $amount = 50;
 
-    $success = add_query_arg(['rsv_stripe'=>'return','session_id'=>'{CHECKOUT_SESSION_ID}','accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,'name'=>rawurlencode($name),'email'=>rawurlencode($email)], rsv_checkout_url());
-    $cancel  = add_query_arg(['step'=>2,'accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co], rsv_checkout_url());
+    $success = add_query_arg([
+        'rsv_stripe'=>'return','session_id'=>'{CHECKOUT_SESSION_ID}',
+        'accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,
+        'first_name'=>rawurlencode($fname),'last_name'=>rawurlencode($lname),
+        'email'=>rawurlencode($email),'phone'=>rawurlencode($phone),'guests'=>$guests
+    ], rsv_checkout_url());
+    $cancel  = add_query_arg(['accomm'=>$accomm_id,'ci'=>$ci,'co'=>$co,'guests'=>$guests], rsv_checkout_url());
 
     $body = [
         'mode' => 'payment',
@@ -37,7 +46,9 @@ function rsv_stripe_checkout(){
             ],
         ]],
         'metadata' => [
-            'accomm_id'=>$accomm_id,'ci'=>$ci,'co'=>$co,'guest_name'=>$name,'guest_email'=>$email,
+            'accomm_id'=>$accomm_id,'ci'=>$ci,'co'=>$co,
+            'guest_first_name'=>$fname,'guest_last_name'=>$lname,
+            'guest_phone'=>$phone,'guest_email'=>$email,'guests'=>$guests,
         ]
     ];
     $headers = [
