@@ -34,7 +34,9 @@ class Reeserva_GitHub_Updater {
     return $res;
   }
   function rename_source($source, $remote_source, $upgrader, $hook_extra){
-    if(isset($hook_extra['plugin']) && $hook_extra['plugin'] === plugin_basename($this->file)){
+    $prefix  = $this->owner.'-'.$this->repo.'-';
+    $base    = basename($source);
+    if(strpos($base, $prefix) === 0){
       $desired = trailingslashit($remote_source).$this->slug;
       if($source !== $desired && is_dir($source) && !is_dir($desired)){
         rename($source, $desired);
