@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Reeserva Booking Suite
  * Description: Airbnb‑style booking system with a single “Accommodation” post type. Calendar price editor with periods & per‑period variations, multi‑step checkout with Stripe, iCal import/export, email notifications, and frontend admin shortcodes.
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: simoneomedia
  * Text Domain: reeservaplugin
  * Update URI: https://github.com/simoneomedia/reeservaplugin
