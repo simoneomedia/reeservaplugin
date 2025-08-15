@@ -13,6 +13,20 @@ function RSV_register_cpts(){
         'labels'=>['name'=>__('Bookings','reeserva'),'singular_name'=>__('Booking','reeserva')],
         'public'=>false,'show_ui'=>true,'menu_icon'=>'dashicons-tickets','supports'=>['title','editor'],
     ]);
+    register_post_status('confirmed', [
+        'label'                     => _x('Confirmed', 'post status', 'reeserva'),
+        'public'                    => true,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop('Confirmed <span class="count">(%s)</span>', 'Confirmed <span class="count">(%s)</span>', 'reeserva')
+    ]);
+    register_post_status('pending', [
+        'label'                     => _x('Pending', 'post status', 'reeserva'),
+        'public'                    => true,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop('Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'reeserva')
+    ]);
     register_post_type('rsv_season',[
         'label'=>__('Season','reeserva'),
         'public'=>false,'show_ui'=>false,'supports'=>['title'],
