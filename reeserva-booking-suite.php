@@ -10,7 +10,9 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define('RSV_VER','1.5.0');
+// Derive plugin version from header to keep constants in sync with the release version.
+$rsv_meta = get_file_data(__FILE__, ['Version' => 'Version'], false);
+define('RSV_VER', $rsv_meta['Version']);
 define('RSV_PATH', plugin_dir_path(__FILE__));
 define('RSV_URL',  plugin_dir_url(__FILE__));
 //test
