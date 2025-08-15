@@ -4,11 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists('Reeserva_GitHub_Updater') ){
 class Reeserva_GitHub_Updater {
-  private $file; private $owner; private $repo; private $branch;
+  private $file; private $owner; private $repo; private $branch; private $slug;
   function __construct($file, $args){
     $this->file = $file; $this->owner=$args['owner']; $this->repo=$args['repo']; $this->branch=$args['branch'];
+    $this->slug = dirname(plugin_basename($this->file));
     add_filter('pre_set_site_transient_update_plugins', [$this,'check']);
     add_filter('plugins_api', [$this,'api'], 10, 3);
+    add_filter('upgrader_source_selection', [$this,'rename_source'], 10, 4);
   }
   function check($transient){
     if(empty($transient->checked)) return $transient;
@@ -30,5 +32,15 @@ class Reeserva_GitHub_Updater {
   }
   function api($res, $action, $args){
     return $res;
+  }
+  function rename_source($source, $remote_source, $upgrader, $hook_extra){
+    if(isset($hook_extra['plugin']) && $hook_extra['plugin'] === plugin_basename($this->file)){
+      $desired = trailingslashit($remote_source).$this->slug;
+      if($source !== $desired && is_dir($source) && !is_dir($desired)){
+        rename($source, $desired);
+        return $desired;
+      }
+    }
+    return $source;
   }
 }}
